@@ -22,10 +22,10 @@ template emit-error ($missing) {
 }
 
 match configuration {
-  if ( $re1var > 80 ) {
+  if ( $re1var > 60 ) {
     call emit-error($missing="var of RE1");
   }
-  if ( $re0var > 80 ) {
+  if ( $re0var > 60 ) {
     call emit-error($missing="var of RE0");
   }
  }
