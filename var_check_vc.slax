@@ -1,0 +1,80 @@
+/*
+*  Author        : huasu@juniper.net
+*  Version       :
+*  Platform      : MX-VC only
+*  Release       : 0.1
+*  Description   : Function of this commit script is to abort the commit process if any /var among 4 REs has exceeded 60% used space. User need to clean up the /var directory before proceed with a commit.
+*  Installation:
+Copy this script to /var/db/scripts/commit/ of VC-Mm, upon commit below configuration it will auto synchronize with other 3 REs. So that all the REs will have same version of this script.
+set system scripts commit file var_check_vc.slax
+set system scripts synchronize
+
+After commit above changes,user will only be able to skip this commit checking process  by "delete system scripts commit file var_check_vc.slax"
+
+*  Revision History:
+*  0.1  28/09/2020- initial release
+
+********************************************************************************
+*
+*  Copyright (c) 2016  Juniper Networks. All Rights Reserved.
+*
+*  YOU MUST ACCEPT THE TERMS OF THIS DISCLAIMER TO USE THIS SOFTWARE
+*
+*  JUNIPER IS WILLING TO MAKE THE INCLUDED SCRIPTING SOFTWARE AVAILABLE TO YOU
+*  ONLY UPON THE CONDITION THAT YOU ACCEPT ALL OF THE TERMS CONTAINED IN THIS
+*  DISCLAIMER. PLEASE READ THE TERMS AND CONDITIONS OF THIS DISCLAIMER
+*  CAREFULLY.
+*
+*  THE SOFTWARE CONTAINED IN THIS FILE IS PROVIDED "AS IS." JUNIPER MAKES NO
+*  WARRANTIES OF ANY KIND WHATSOEVER WITH RESPECT TO SOFTWARE. ALL EXPRESS OR
+*  IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING ANY WARRANTY
+*  OF NON-INFRINGEMENT OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR A
+*  PARTICULAR PURPOSE, ARE HEREBY DISCLAIMED AND EXCLUDED TO THE EXTENT
+*  ALLOWED BY APPLICABLE LAW.
+*
+*  IN NO EVENT WILL JUNIPER BE LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA, OR
+*  FOR DIRECT, SPECIAL, INDIRECT, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE
+*  DAMAGES HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY ARISING
+*  OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF JUNIPER HAS
+*  BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+********************************************************************************
+*/
+version 1.0;
+
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+
+import "../import/junos.xsl";
+
+
+var $command = <command> "show system storage all-members invoke-on all-routing-engines";
+var $data1 = jcs:invoke($command);
+var $m0re1var = $data1//multi-routing-engine-item[re-name=="member0-re1"]//filesystem[filesystem-name=="/dev/gpt/var"]/used-percent;
+var $m0re0var = $data1//multi-routing-engine-item[re-name=="member0-re0"]//filesystem[filesystem-name=="/dev/gpt/var"]/used-percent;
+var $m1re1var = $data1//multi-routing-engine-item[re-name=="member1-re1"]//filesystem[filesystem-name=="/dev/gpt/var"]/used-percent;
+var $m1re0var = $data1//multi-routing-engine-item[re-name=="member1-re0"]//filesystem[filesystem-name=="/dev/gpt/var"]/used-percent;
+
+template emit-error ($missing) {
+    var $message = ""_ $missing _ " has exceeded 60%,use 'show system storage all-members invoke-on all-routing-engines | match /dev/gpt/var' to check the /var usage and clean up the files accordingly,commit aborting!";
+    <xnm:error> {
+        <message> {
+            copy-of $message;
+        }
+    }
+}
+
+match configuration {
+  if ( $m0re1var > 60 ) {
+    call emit-error($missing="var of member0-RE1");
+  }
+  if ( $m0re0var > 60 ) {
+    call emit-error($missing="var of member0-RE0");
+  }
+  if ( $m1re1var > 60 ) {
+    call emit-error($missing="var of member1-RE1");
+  }
+  if ( $m1re0var > 60 ) {
+    call emit-error($missing="var of member1-RE0");
+  }
+ }
