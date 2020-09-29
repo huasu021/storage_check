@@ -4,12 +4,13 @@
 *  Platform      : MX-VC only
 *  Release       : 0.1
 *  Description   : Function of this commit script is to abort the commit process if any /var among 4 REs has exceeded 60% used space. User need to clean up the /var directory before proceed with a commit.
+                   The threshold of /var is based on https://kb.juniper.net/KB35836
 *  Installation:
 Copy this script to /var/db/scripts/commit/ of VC-Mm, upon commit below configuration it will auto synchronize with other 3 REs. So that all the REs will have same version of this script.
 set system scripts commit file var_check_vc.slax
 set system scripts synchronize
 
-After commit above changes,user will only be able to skip this commit checking process  by "delete system scripts commit file var_check_vc.slax"
+After commit above changes, user will only be able to skip this commit checking process  by "delete system scripts commit file var_check_vc.slax"
 
 *  Revision History:
 *  0.1  28/09/2020- initial release
