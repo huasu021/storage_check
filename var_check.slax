@@ -1,0 +1,31 @@
+version 1.0;
+
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+
+import "../import/junos.xsl";
+
+
+var $command = <command> "show system storage invoke-on all-routing-engines";
+var $data1 = jcs:invoke($command);
+var $re1var = $data1//multi-routing-engine-item[re-name=="re1"]//filesystem[filesystem-name=="/dev/gpt/var"]/used-percent;
+var $re0var = $data1//multi-routing-engine-item[re-name=="re0"]//filesystem[filesystem-name=="/dev/gpt/var"]/used-percent;
+
+template emit-error ($missing) {
+    var $message = ""_ $missing _ " has exceeded 60%, use 'show system storage all-members invoke-on all-routing-engines | match /dev/gpt/var' to check the /var usage and clean up accordingly,commit aborting!";
+    <xnm:error> {
+        <message> {
+            copy-of $message;
+        }
+    }
+}
+
+match configuration {
+  if ( $re1var > 80 ) {
+    call emit-error($missing="var of RE1");
+  }
+  if ( $re0var > 80 ) {
+    call emit-error($missing="var of RE0");
+  }
+ }
