@@ -1,3 +1,45 @@
+/*
+*  Author        : huasu@juniper.net
+*  Version       :
+*  Platform      : MX standalone only
+*  Release       : 0.1
+*  Description   : Function of this commit script is to abort the commit process if any /var among 2 REs has exceeded 60% used space. User need to clean up the /var directory before proceed with a commit.
+                   The threshold of /var is based on https://kb.juniper.net/KB35836
+*  Installation:
+Copy this script to /var/db/scripts/commit/ of VC-Mm, upon commit below configuration it will auto synchronize with other RE. So that all the REs will have same version of this script.
+set system scripts commit file var_check.slax
+set system scripts synchronize
+
+After commit above changes, user will only be able to skip this commit checking process  by "delete system scripts commit file var_check.slax"
+
+*  Revision History:
+*  0.1  28/09/2020- initial release
+
+********************************************************************************
+*
+*  Copyright (c) 2016  Juniper Networks. All Rights Reserved.
+*
+*  YOU MUST ACCEPT THE TERMS OF THIS DISCLAIMER TO USE THIS SOFTWARE
+*
+*  JUNIPER IS WILLING TO MAKE THE INCLUDED SCRIPTING SOFTWARE AVAILABLE TO YOU
+*  ONLY UPON THE CONDITION THAT YOU ACCEPT ALL OF THE TERMS CONTAINED IN THIS
+*  DISCLAIMER. PLEASE READ THE TERMS AND CONDITIONS OF THIS DISCLAIMER
+*  CAREFULLY.
+*
+*  THE SOFTWARE CONTAINED IN THIS FILE IS PROVIDED "AS IS." JUNIPER MAKES NO
+*  WARRANTIES OF ANY KIND WHATSOEVER WITH RESPECT TO SOFTWARE. ALL EXPRESS OR
+*  IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING ANY WARRANTY
+*  OF NON-INFRINGEMENT OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR A
+*  PARTICULAR PURPOSE, ARE HEREBY DISCLAIMED AND EXCLUDED TO THE EXTENT
+*  ALLOWED BY APPLICABLE LAW.
+*
+*  IN NO EVENT WILL JUNIPER BE LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA, OR
+*  FOR DIRECT, SPECIAL, INDIRECT, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE
+*  DAMAGES HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY ARISING
+*  OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF JUNIPER HAS
+*  BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+********************************************************************************
+*/
 version 1.0;
 
 ns junos = "http://xml.juniper.net/junos/*/junos";
